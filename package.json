@@ -31,7 +31,9 @@
     "sqlite3": "~3.1.0"
   },
   "devDependencies": {
-    "eslint": "~2.7.0"
+    "chai": "^3.5.0",
+    "eslint": "~2.7.0",
+    "mocha": "^2.4.5"
   },
   "scripts": {
     "eslint": "eslint src/**/*.js"
