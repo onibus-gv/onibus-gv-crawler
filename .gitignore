@@ -1,0 +1,4 @@
+node_modules
+temppdf/*
+npm-debug.log
+onibus.db
