@@ -23,7 +23,7 @@ const customRequest = (method, opts) => {
     const operation = retry.operation({
       retries: 3,
       factor: 1,
-      minTimeout: 1000
+      minTimeout: 100
     });
 
     operation.attempt(function(currentAttempt) {
