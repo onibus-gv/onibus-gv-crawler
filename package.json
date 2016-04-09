@@ -36,7 +36,8 @@
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "eslint": "eslint src/**/*.js"
+    "eslint": "eslint src/**/*.js",
+    "test": "mocha src/**/*.test.js"
   },
   "engines": {
     "node": ">= 5.0.0"
