@@ -2,3 +2,4 @@ node_modules
 temppdf/*
 npm-debug.log
 onibus.db
+onibus.db-journal
