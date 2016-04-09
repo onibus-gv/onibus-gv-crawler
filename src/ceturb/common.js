@@ -7,7 +7,9 @@ const Observacao = models.Observacao;
 const Itinerario = models.Itinerario;
 
 const ProgressBar = require('progress');
-const cheerio = require('cheerio');
+
+const parsers = require('./parsers');
+
 const iconv = require('iconv-lite');
 const functions = require('../functions');
 const sequentialPromise = functions.sequentialPromise;
@@ -51,45 +53,12 @@ const insertItinerarios = (paginaDestino, linha) => {
     }
   })
   .then(function(body) {
-    const $ = cheerio.load(iconv.decode(body, 'binary'));
+    const itinerarios = parsers.parseItinerarios(
+      linha.id,
+      iconv.decode(body, 'binary')
+    );
 
-    if ($('p').length > 0) {
-      return Promise.resolve();
-    }
-
-    const $table = $('table.roteiro').first();
-    const $ida = $table.find('td').eq(0).children('span');
-    const $volta = $table.find('td').eq(1).children('span');
-
-    const arrIda = $ida.nextAll()
-      .filter((i, el) => {
-        const txt = $(el)[0].next.data;
-        return typeof txt !== 'undefined' && txt.trim() != 'IDA' && txt.trim() != '';
-      })
-      .map((i, el) => {
-        return {
-          sentido: 1,
-          linhaId: linha.id,
-          rua: $(el)[0].next.data.trim()
-        };
-      })
-      .get();
-
-    const arrVolta = $volta.nextAll()
-      .filter((i, el) => {
-        const txt = $(el)[0].next.data;
-        return typeof txt !== 'undefined' && txt.trim() != 'VOLTA' && txt.trim() != '';
-      })
-      .map((i, el) => {
-        return {
-          sentido: 2,
-          linhaId: linha.id,
-          rua: $(el)[0].next.data.trim()
-        };
-      })
-      .get();
-
-    return Itinerario.bulkCreate(arrIda.concat(arrVolta));
+    return Itinerario.bulkCreate(itinerarios.ida.concat(itinerarios.volta));
   });
 };
 
@@ -102,42 +71,12 @@ const getLinhas = (empresaId, linhasDropdown) => {
     }
   })
   .then((body) => {
-    const $ = cheerio.load(iconv.decode(body, 'binary'));
-    const linhas = $(linhasDropdown).map((i, el) => {
-      return {
-        linha: $(el).val(),
-        nome: $(el).text().split(' - ').slice(1).join(' - '),
-        empresaId: empresaId
-      };
-    })
-    .get();
-
+    const linhas = parsers.parseLinhas(empresaId, linhasDropdown, iconv.decode(body, 'binary'));
     return Linha.bulkCreate(linhas)
       .then(() => {
         log(`Inseridas ${linhas.length} linha(s)`);
       });
   });
-};
-
-const getDiaDaSemana = (txt) => {
-  switch(txt.trim()) {
-  case 'DIAS ÚTEIS':
-  case 'DIAS &#xFFFD;TEIS':
-  case 'DIAS &#xDA;TEIS':
-    return 1;
-  case 'SÁBADO':
-  case 'S&#xC1;BADO':
-  case 'S&#xFFFD;BADO':
-    return 2;
-  case 'DOMINGOS E FERIADOS':
-    return 3;
-  case 'AT&#xFFFD;PICOS ENTRE FERIADOS':
-  case 'AT&#xCD;PICOS ENTRE FERIADOS':
-  case 'ATÍPICOS ENTRE FERIADOS':
-    return 4;
-  default:
-    return 1;
-  }
 };
 
 const insertHorarios = (paginaDestino, linha) => {
@@ -151,66 +90,18 @@ const insertHorarios = (paginaDestino, linha) => {
     }
   })
   .then((body) => {
-    const $ = cheerio.load(iconv.decode(body, 'binary'));
+    const decodedBody = iconv.decode(body, 'binary');
 
-    // Nenhum Horário
-    if ($('p').length > 0) {
-      return Promise.resolve();
-    }
+    const parsed = parsers.parseSaidaDestino(decodedBody);
 
-    const $table = $('td[colspan=3]').find('table').find('tr').eq(1).children('td');
-    const saida = $table.find('span').eq(1).text().replace('Saída: ', '');
-    const destino = $table.find('hr')
-                          .eq(2)
-                          .next('span')
-                          .text()
-                          .replace('Destino: ', '')
-                          .replace('Saída: ', '')
-                          .trim();
-
-    linha.saida = saida;
-    linha.destino = destino;
+    linha.saida = parsed.saida;
+    linha.destino = parsed.destino;
     linha.save();
 
-    const obs = $('table')
-      .last()
-      .nextAll()
-      .filter((i, el) => {
-        const txt = $(el)[0].next.data;
-        return typeof txt != 'undefined' ? (txt.trim() != 'OBS:' && txt.trim() != '') : null;
-      })
-      .map((i, el) => {
-        const observacao = $(el)[0].next.data.trim().split(' - ');
-        const sigla = observacao.shift();
-        const obs = observacao.join(' - ');
-        return {
-          obs,
-          sigla,
-          linhaId: linha.id
-        };
-      })
-      .get();
+    const observacoes = parsers.parseObservacoes(linha.id, decodedBody);
+    const horarios = parsers.parseHorarios(linha.id, decodedBody);
 
-    const horarios = $('td')
-      .slice(2)
-      .filter((i, el) => {
-        return $(el).text().trim() !== '' && $(el).text().split(':').length === 2;
-      })
-      .map((i, el) => {
-        const tempo = $(el).text().split(':');
-        const hasSigla = tempo[1].trim().length === 3;
-        return {
-          hora: parseInt(tempo[0].trim(), 10),
-          minuto: parseInt(tempo[1].trim(), 10),
-          sentido: $(el).closest('table').prevAll('hr').length / 2,
-          dia: getDiaDaSemana($(el).closest('table').prevAll('span').first().html()),
-          siglaObs: hasSigla ? tempo[1].trim().slice(-1) : null,
-          linhaId: linha.id
-        };
-      })
-      .get();
-
-    return Observacao.bulkCreate(obs)
+    return Observacao.bulkCreate(observacoes)
     .then(() => {
       return sequentialPromise(chunk(horarios, 100), (horariosChunk) => {
         return Horario.bulkCreate(horariosChunk);
