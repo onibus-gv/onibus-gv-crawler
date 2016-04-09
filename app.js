@@ -18,14 +18,11 @@ const opts = {truncate: true};
 const log = (args) => console.log(args);
 
 sequelize.sync()
-
-/*
 .then(() => Empresa.destroy(opts))
 .then(() => Linha.destroy(opts))
 .then(() => Horario.destroy(opts))
 .then(() => Itinerario.destroy(opts))
 .then(() => Observacao.destroy(opts))
-*/
 
 .then(() => {
   log('');
@@ -37,10 +34,10 @@ sequelize.sync()
 .then(() => Empresa.build({nome: 'Transcol'}).save())
 .then((empresa) => {
   return transcol.getLinhas(empresa.id)
+          .then(() => transcol.getHorarios(empresa.id))
           .then(() => transcol.getItinerarios(empresa.id))
 })
 
-/*
 .then(() => {
   log('');
   log('-------------------------');
@@ -81,6 +78,6 @@ sequelize.sync()
     .then(() => vitoria.getHorarios(empresa.id))
     .then(() => vitoria.getItinerarios(empresa.id));
 })
-*/
+
 .then(() => log('ok'))
 .catch((err) => log(err));
