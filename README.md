@@ -23,6 +23,11 @@ node app.js
 
 Após o fim da execução será criado um arquivo `onibus.db` na raiz do projeto
 
+### Testando
+```shell
+npm test
+```
+
 ### Linter
 ```shell
 npm run eslint
