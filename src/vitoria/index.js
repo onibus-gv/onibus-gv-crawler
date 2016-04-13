@@ -56,8 +56,6 @@ const getLinhas = (empresaId) => {
     encoding: 'utf-8'
   })
   .then((body) => {
-    var fs = require('fs');
-    fs.writeFile('test', body);
     const linhas = parser.parseLinhas(empresaId, body);
     return Linha.bulkCreate(linhas)
     .then(() => {
