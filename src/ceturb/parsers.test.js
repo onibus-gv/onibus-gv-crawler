@@ -22,10 +22,10 @@ var itinerariosAssertion = function(itinerarios, done) {
   }
 
   // Volta
-  for (var i = 0; i < itinerarios.volta.length; i++) {
-    assert.notStrictEqual('', itinerarios.volta[i].rua, 'rua cannot be empty');
-    assert.isNotNull(itinerarios.volta[i].rua, 'rua cannot be null');
-    assert.strictEqual(2, itinerarios.volta[i].sentido, 'sentido must be 2');
+  for (var j = 0; j < itinerarios.volta.length; j++) {
+    assert.notStrictEqual('', itinerarios.volta[j].rua, 'rua cannot be empty');
+    assert.isNotNull(itinerarios.volta[j].rua, 'rua cannot be null');
+    assert.strictEqual(2, itinerarios.volta[j].sentido, 'sentido must be 2');
   }
 
   done();

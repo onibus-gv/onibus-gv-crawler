@@ -26,7 +26,7 @@ const customRequest = (method, opts) => {
       minTimeout: 100
     });
 
-    operation.attempt(function(currentAttempt) {
+    operation.attempt(function() {
       request[method](opts, (error, response, body) => {
         const err = error || response.statusCode !== 200;
 
