@@ -39,7 +39,7 @@ const parseItinerarios = (body) => {
         sentido: 1,
         linhaId: linha,
         rua: itinerario.trim()
-      }
+      };
     });
 
     const volta = itinerarios.reverse().map((itinerario) => {
@@ -47,7 +47,7 @@ const parseItinerarios = (body) => {
         sentido: 2,
         linhaId: linha,
         rua: itinerario.trim()
-      }
+      };
     });
 
     return ida.concat(volta);
