@@ -93,7 +93,7 @@ const parseLinhas = (empresaId, body) => {
 };
 
 const parseHorarios = (linhaId, evtData) => {
-  const horarios = evtData.data.Pages.map((pdf) => {
+  const horarios = evtData.formImage.Pages.map((pdf) => {
     return pdf.Texts
       .filter((obj) => {
         const txt = decodeURIComponent(obj.R[0].T).trim().split(/:|;/);
