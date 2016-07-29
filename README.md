@@ -2,6 +2,12 @@
 
 Crawler para pegar horários dos ônibus da grande vitória
 
+Empresas funcionando:
+
+- Ceturb ( Transcol )
+- Sanremo
+- Seletivo Vitória
+
 ### Pré-Requisitos
 
 * [node.js](https://nodejs.org) >= 5.0.0 e [npm](http://npmjs.com) >= v2.0.0.
