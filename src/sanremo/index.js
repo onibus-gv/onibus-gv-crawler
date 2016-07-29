@@ -61,8 +61,8 @@ const insertHorarios = (linha) => {
     });
 
     pdfParser.on('pdfParser_dataReady', (evtData) => {
-      if ((!!evtData) && (!!evtData.data)) {
-        const linhaId = parseInt(evtData.pdfFilePath.replace('.pdf', '').replace('./temppdf/', ''), 10);
+      if ((!!evtData) && (!!evtData.formImage)) {
+        const linhaId = parseInt(pdfParser.pdfFilePath.replace('.pdf', '').replace('./temppdf/', ''), 10);
         const horarios = parser.parseHorarios(linhaId, evtData);
 
         Horario
