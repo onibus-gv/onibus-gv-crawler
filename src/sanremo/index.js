@@ -60,6 +60,10 @@ const insertHorarios = (linha) => {
       pdfParser.loadPDF('./temppdf/' + linha.id + '.pdf');
     });
 
+    pdfParser.on('pdfParser_dataError', (errData) => {
+      reject('Erro ao ler pdf: ' + pdfParser.pdfFilePath);
+    });
+
     pdfParser.on('pdfParser_dataReady', (evtData) => {
       if ((!!evtData) && (!!evtData.formImage)) {
         const linhaId = parseInt(pdfParser.pdfFilePath.replace('.pdf', '').replace('./temppdf/', ''), 10);
