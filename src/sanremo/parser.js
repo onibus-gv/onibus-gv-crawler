@@ -73,7 +73,15 @@ const parseItinerarios = (body) => {
 const parseLinhas = (empresaId, body) => {
   const $ = cheerio.load(body);
 
-  return $('#conteudo').children('a').map((i, el) => {
+  return $('#conteudo').children('a')
+  .filter((i, el) => {
+    const split = $(el).text().split('Via');
+    const linhaSplit = split[0].split(' - ');
+    const linha = linhaSplit.shift().trim();
+
+    return linha !== '040';
+  })
+  .map((i, el) => {
     const split = $(el).text().split('Via');
     const linhaSplit = split[0].split(' - ');
     const linha = linhaSplit.shift().trim();
