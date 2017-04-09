@@ -36,6 +36,7 @@ sequelize.sync()
   return transcol.getLinhas(empresa.id)
           .then(() => transcol.getHorarios(empresa.id))
           .then(() => transcol.getItinerarios(empresa.id))
+          .then(() => transcol.getObservacoes(empresa.id));
 })
 
 .then(() => {
@@ -50,6 +51,7 @@ sequelize.sync()
   return seletivo.getLinhas(empresa.id)
     .then(() => seletivo.getHorarios(empresa.id))
     .then(() => seletivo.getItinerarios(empresa.id))
+    .then(() => seletivo.getObservacoes(empresa.id));
 })
 
 .then(() => {

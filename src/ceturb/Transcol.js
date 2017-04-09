@@ -1,15 +1,16 @@
 const common = require('./common');
 
-const pagHorarios = 'adm510_2.asp';
-const pagItinerarios = 'adm500_2.asp';
-const linhasDropdown = '#select2 option';
+const tipoLinha = 'T';
 
 exports = module.exports = {
-  getLinhas: (empresaId) => common.getLinhas(empresaId, linhasDropdown),
+  getLinhas: (empresaId) => common.getLinhas(empresaId, tipoLinha),
   getHorarios: (empresaId) => {
-    return common.getHorarios(empresaId, pagHorarios);
+    return common.getHorarios(empresaId);
   },
   getItinerarios: (empresaId) => {
-    return common.getItinerarios(empresaId, pagItinerarios);
+    return common.getItinerarios(empresaId);
+  },
+  getObservacoes: (empresaId) => {
+    return common.getObservacoes(empresaId);
   }
 };
