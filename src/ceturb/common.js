@@ -104,7 +104,7 @@ const insertHorarios = async (linha) => {
   let destino = null;
 
   const horarios = response.map((horario) => {
-    const { hora, minuto } = horario.Hora_Saida.split(':');
+    const [hora, minuto] = horario.Hora_Saida.split(':');
 
     if (saida === null && horario.Terminal_Seq === 1) {
       saida = horario.Desc_Terminal;
@@ -115,8 +115,8 @@ const insertHorarios = async (linha) => {
     }
 
     return {
-      hora,
-      minuto,
+      hora: parseInt(hora, 10),
+      minuto: parseInt(minuto, 10),
       sentido: horario.Terminal_Seq,
       dia: getDiaDaSemana(horario.Descricao_Hora),
       linhaId: linha.id,
@@ -161,8 +161,9 @@ const insertObservacoes = async (linha) => {
 
   const observacoes = response.map((observacao) => {
     return {
-      observacao: observacao.Descricao_Orientacao,
+      obs: observacao.Descricao_Orientacao,
       sigla: observacao.Tipo_Orientacao,
+      linhaId: linha.id,
     };
   });
 
