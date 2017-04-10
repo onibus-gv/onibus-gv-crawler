@@ -99,7 +99,7 @@ const getLinhas = async (empresaId) => {
 
   await Linha.bulkCreate(linhas);
   console.log(`Inseridas ${linhas.length} linha(s)`);
-  const dbLinhas = Linha.findAll();
+  const dbLinhas = await Linha.findAll();
 
   const dbItinerarios = itinerarios.map((itinerario) => {
     itinerario.linhaId = getLinhaId(dbLinhas, itinerario.linhaId);
