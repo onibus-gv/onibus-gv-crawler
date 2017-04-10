@@ -1,43 +1,39 @@
 'use strict';
 
-const models = require('../models');
-const Linha = models.Linha;
-const Horario = models.Horario;
-const Itinerario = models.Itinerario;
+const {
+  Linha,
+  Horario,
+  Itinerario
+} = require('../models');
 
 const ProgressBar = require('progress');
 const http = require('http');
 const fs = require('fs');
 const PDFParser = require('pdf2json/pdfparser');
 
-const functions = require('../functions');
-const sequentialPromise = functions.sequentialPromise;
-const customRequest = functions.customRequest;
+const {
+  sequentialPromise,
+  customRequest
+} = require('../functions');
 
 const parser = require('./parser');
 
-const log = (txt) => {
-  console.log(txt);
-};
-
-const getHorarios = (empresaId) => {
-  return Linha.findAll({
+const getHorarios = async (empresaId) => {
+  const linhas = await Linha.findAll({
     where: {
       empresaId: empresaId
     }
-  })
-  .then((linhas) => {
+  });
 
-    log(`Preparando para inserir horários de ${linhas.length} linha(s)`);
+  console.log(`Preparando para inserir horários de ${linhas.length} linha(s)`);
 
-    const bar = new ProgressBar('Inserindo [:bar] :percent', {
-      total: linhas.length,
-      width: 40
-    });
+  const bar = new ProgressBar('Inserindo [:bar] :percent', {
+    total: linhas.length,
+    width: 40
+  });
 
-    return sequentialPromise(linhas, (linha) => {
-      return insertHorarios(linha).then(bar.tick.bind(bar));
-    });
+  return sequentialPromise(linhas, (linha) => {
+    return insertHorarios(linha).then(bar.tick.bind(bar));
   });
 };
 
@@ -93,31 +89,25 @@ const getLinhaId = (linhas, linhaId) => {
   }
 };
 
-const getLinhas = (empresaId) => {
-  return customRequest('get', {
+const getLinhas = async (empresaId) => {
+  const body = await customRequest('get', {
     url: 'http://www.viacaosanremo.com.br/horarios.html'
-  })
-  .then(function(body) {
-
-    const linhas = parser.parseLinhas(empresaId, body);
-    let itinerarios = parser.parseItinerarios(body);
-
-    return Linha.bulkCreate(linhas)
-      .then(() => {
-        log(`Inseridas ${linhas.length} linha(s)`);
-        return Linha.findAll();
-      })
-      .then((_linhas) => {
-        return itinerarios.map((itinerario) => {
-          itinerario.linhaId = getLinhaId(_linhas, itinerario.linhaId);
-          return itinerario;
-        });
-      })
-      .then(Itinerario.bulkCreate.bind(Itinerario))
-      .then((rows) => {
-        log(`Inseridos ${rows.length} itinerário(s)`);
-      });
   });
+
+  const linhas = parser.parseLinhas(empresaId, body);
+  const itinerarios = parser.parseItinerarios(body);
+
+  await Linha.bulkCreate(linhas);
+  console.log(`Inseridas ${linhas.length} linha(s)`);
+  const dbLinhas = Linha.findAll();
+
+  const dbItinerarios = itinerarios.map((itinerario) => {
+    itinerario.linhaId = getLinhaId(dbLinhas, itinerario.linhaId);
+    return itinerario;
+  });
+
+  const rows = await Itinerario.bulkCreate(dbItinerarios);
+  console.log(`Inseridos ${rows.length} itinerário(s)`);
 };
 
 const getItinerarios = () => {};
