@@ -101,11 +101,16 @@ const parseLinhas = (empresaId, body) => {
 };
 
 const parseHorarios = (linhaId, evtData) => {
+  const halfPage = evtData.formImage.Width / 2;
+  const firstDayHeight = 26;
+  const secondDayHeight = 36;
+  const lastDayHeight = 46;
+
   const horarios = evtData.formImage.Pages.map((pdf) => {
     return pdf.Texts
       .filter((obj) => {
         const txt = decodeURIComponent(obj.R[0].T).trim().split(/:|;/);
-        return txt.length == 2 && !isNaN(parseInt(txt[0], 10)) && obj.y < 35;
+        return txt.length == 2 && !isNaN(parseInt(txt[0], 10)) && obj.y < lastDayHeight;
       })
       .map((obj) => {
         const txt = decodeURIComponent(obj.R[0].T).trim().split(/:|;/);
@@ -113,9 +118,8 @@ const parseHorarios = (linhaId, evtData) => {
         const minuto = parseInt(txt[1], 10);
         const x = obj.x;
         const y = obj.y;
-        const halfPage = 50.50;
         const sentido = x < halfPage ? 1 : 2;
-        const dia = y < 17 ? 1 : (y < 27 ? 2 : 3);
+        const dia = y < firstDayHeight ? 1 : (y < secondDayHeight ? 2 : 3);
 
         return {
           hora,
@@ -123,7 +127,7 @@ const parseHorarios = (linhaId, evtData) => {
           sentido,
           dia,
           siglaObs: null,
-          linhaId
+          linhaId,
         };
       });
   });
