@@ -40,6 +40,6 @@
     "test": "mocha src/**/*.test.js"
   },
   "engines": {
-    "node": ">= 5.0.0"
+    "node": ">= 7.6"
   }
 }

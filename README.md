@@ -13,7 +13,7 @@ Empresas funcionando:
 
 ### Pré-Requisitos
 
-* [node.js](https://nodejs.org) >= 5.0.0 e [npm](http://npmjs.com) >= v2.0.0.
+* [node.js](https://nodejs.org) >= 7.6
 * [git](https://git-scm.com/)
 
 ### Instalando
