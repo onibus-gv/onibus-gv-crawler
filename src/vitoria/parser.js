@@ -101,7 +101,7 @@ const parseHorarios = (linhaId, body) => {
     .get();
 
   const domingo = $('.data')
-    .eq(0)
+    .eq(2)
     .find('td')
     .filter((i, el) => {
       return $(el).text().trim() !== '' && $(el).text().trim() !== 'Não circula';
