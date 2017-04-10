@@ -35,7 +35,7 @@ const customRequest = (method, opts) => {
         }
 
         if (err) {
-          reject(operation.mainError());
+          reject(operation);
         }
 
         resolve(body);
