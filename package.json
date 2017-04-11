@@ -5,7 +5,7 @@
   "author": "Rodrigo de Assis Siqueira <knoxzin1@gmail.com> (http://knoxzin1.github.io)",
   "main": "app.js",
   "license": "MIT",
-  "homepage": "https://github.com/knoxzin1/onibus-gv-crawler",
+  "homepage": "https://github.com/onibus-gv/onibus-gv-crawler",
   "keywords": [
     "transcol",
     "sanremo",
@@ -15,10 +15,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/knoxzin1/onibus-gv-crawler.git"
+    "url": "git://github.com/onibus-gv/onibus-gv-crawler.git"
   },
   "bugs": {
-    "url": "https://github.com/knoxzin1/onibus-gv-crawler/issues"
+    "url": "https://github.com/onibus-gv/onibus-gv-crawler/issues"
   },
   "dependencies": {
     "cheerio": "^0.22.0",

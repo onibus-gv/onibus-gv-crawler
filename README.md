@@ -1,7 +1,7 @@
 # Ônibus GV Crawler
 
-[![Build Status](https://travis-ci.org/knoxzin1/onibus-gv-crawler.svg?branch=master)](https://travis-ci.org/knoxzin1/onibus-gv-crawler)
-[![Dependency Status](https://dependencyci.com/github/knoxzin1/onibus-gv-crawler/badge)](https://dependencyci.com/github/knoxzin1/onibus-gv-crawler)
+[![Build Status](https://travis-ci.org/onibus-gv/onibus-gv-crawler.svg?branch=master)](https://travis-ci.org/onibus-gv/onibus-gv-crawler)
+[![Dependency Status](https://dependencyci.com/github/onibus-gv/onibus-gv-crawler/badge)](https://dependencyci.com/github/onibus-gv/onibus-gv-crawler)
 
 Crawler para pegar horários dos ônibus da grande vitória
 
