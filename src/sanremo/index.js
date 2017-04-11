@@ -27,7 +27,7 @@ const getHorarios = async (empresaId) => {
 
   console.log(`Preparando para inserir horários de ${linhas.length} linha(s)`);
 
-  const bar = new ProgressBar('Inserindo [:bar] :percent', {
+  const bar = new ProgressBar('Inserindo :bar :percent', {
     total: linhas.length,
     width: 40
   });

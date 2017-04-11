@@ -21,7 +21,7 @@ const getItinerarios = async (empresaId) => {
   });
 
   console.log(`Preparando para inserir itinerários de ${linhas.length} linha(s)`);
-  const bar = new ProgressBar('Inserindo [:bar] :percent', { total: linhas.length });
+  const bar = new ProgressBar('Inserindo :bar :percent', { total: linhas.length });
 
   return sequentialPromise(linhas, (linha) => {
     return insertItinerarios(linha).then(bar.tick.bind(bar));
@@ -78,7 +78,7 @@ const getHorarios = async (empresaId) => {
   });
 
   console.log(`Preparando para inserir horários de ${linhas.length} linha(s)`);
-  const bar = new ProgressBar('Inserindo [:bar] :percent', { total: linhas.length });
+  const bar = new ProgressBar('Inserindo :bar :percent', { total: linhas.length });
 
   return sequentialPromise(linhas, (linha) => {
     return insertHorarios(linha).then(bar.tick.bind(bar));
