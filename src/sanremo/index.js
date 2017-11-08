@@ -11,10 +11,7 @@ const http = require('http');
 const fs = require('fs');
 const PDFParser = require('pdf2json/pdfparser');
 
-const {
-  sequentialPromise,
-  customRequest
-} = require('../functions');
+const { sequentialPromise } = require('../functions');
 
 const parser = require('./parser');
 
@@ -95,7 +92,7 @@ const getLinhas = async (empresaId) => {
   const instance = await phantom.create();
   const page = await instance.createPage();
 
-  const status = await page.open('http://viacaosanremo.com.br/horarios');
+  await page.open('http://viacaosanremo.com.br/horarios');
   const body = await page.property('content');
 
   const linhas = parser.parseLinhas(empresaId, body);
