@@ -18,6 +18,8 @@ const {
 
 const parser = require('./parser');
 
+const phantom = require('phantom');
+
 const getHorarios = async (empresaId) => {
   const linhas = await Linha.findAll({
     where: {
@@ -50,7 +52,7 @@ const download = (url, dest, cb) => {
 const insertHorarios = (linha) => {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
-    const url = `http:\/\/www.viacaosanremo.com.br/horarios/${linha.linha}.pdf`;
+    const url = `http:\/\/www.viacaosanremo.com.br/assets/horarios/${linha.linha}.pdf`;
 
     download(url, './temppdf/' + linha.id + '.pdf', () => {
       pdfParser.loadPDF('./temppdf/' + linha.id + '.pdf');
@@ -90,9 +92,11 @@ const getLinhaId = (linhas, linhaId) => {
 };
 
 const getLinhas = async (empresaId) => {
-  const body = await customRequest('get', {
-    url: 'http://www.viacaosanremo.com.br/horarios.html'
-  });
+  const instance = await phantom.create();
+  const page = await instance.createPage();
+
+  const status = await page.open('http://viacaosanremo.com.br/horarios');
+  const body = await page.property('content');
 
   const linhas = parser.parseLinhas(empresaId, body);
   const itinerarios = parser.parseItinerarios(body);

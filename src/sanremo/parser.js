@@ -2,25 +2,28 @@ const cheerio = require('cheerio');
 
 /**
  * Given this layout:
- * <a href="horarios/001.pdf">
- *   001 - Araças x Praia da Costa <BR>
- *   <i>Via Ibes, Gloria, Vila Velha  e Rodoviaria de Itaparica</i>
- * </a>
+ * <div class="feature">
+ *   <h5>001 - Araças - Praia da Costa</h5>
+ *   <p>Via Ibes, Gloria, Vila Velha e Rodoviaria de Itaparica</p>
+ *   <a href="assets/horarios/001.pdf">Visualizar</a>
+ * </div>
  *
  * Should return:
  *
  * {
- *   ida: [
+ *   [
  *     {
- *       rua: [Array of <i> elements splitted by ',' or ' e '],
- *       sentido: 1
- *     }
- *   ],
- *   volta: [
+ *       rua: [Array of addresses splitted by ',' or ' e '],
+ *       sentido: 1,
+ *       linhaId: '001',
+ *     },
+ *     ....
  *     {
- *       rua: [Reverse array of <i> elements splitted by ',' or ' e '],
- *       sentido: 2
+ *       rua: [Reverse array of addresses splitted by ',' or ' e '],
+ *       sentido: 2,
+ *       linhaId: '001',
  *     }
+ *     ....
  *   ]
  * }
  *
@@ -28,11 +31,9 @@ const cheerio = require('cheerio');
 const parseItinerarios = (body) => {
   const $ = cheerio.load(body);
 
-  return $('#conteudo').children('a').map((i, el) => {
-    const split = $(el).text().split('Via');
-    const linhaSplit = split[0].split(' - ');
-    const linha = linhaSplit.shift().trim();
-    const itinerarios = typeof split[1] !== 'undefined' ? split[1].trim().split(/,| e /) : [];
+  return $('.feature').map((i, el) => {
+    const [linha] = $(el).find('h5').text().split(' - ');
+    const itinerarios = $(el).find('p').text().replace('Via ', '').trim().split(/,| e /);
 
     const ida = itinerarios.map((itinerario) => {
       return {
@@ -56,10 +57,11 @@ const parseItinerarios = (body) => {
 
 /**
  * Given this layout:
- * <a href="horarios/001.pdf">
- *   001 - Araças x Praia da Costa <BR>
- *   <i>Via Ibes, Gloria, Vila Velha  e Rodoviaria de Itaparica</i>
- * </a>
+ * <div class="feature">
+ *   <h5>001 - Araças - Praia da Costa</h5>
+ *   <p>Via Ibes, Gloria, Vila Velha e Rodoviaria de Itaparica</p>
+ *   <a href="assets/horarios/001.pdf">Visualizar</a>
+ * </div>
  *
  * Should return:
  *
@@ -73,26 +75,12 @@ const parseItinerarios = (body) => {
 const parseLinhas = (empresaId, body) => {
   const $ = cheerio.load(body);
 
-  return $('#conteudo').children('a')
-  .filter((i, el) => {
-    const split = $(el).text().split('Via');
-    const linhaSplit = split[0].split(' - ');
-    const linha = linhaSplit.shift().trim();
-
-    return linha !== '040';
-  })
-  .map((i, el) => {
-    const split = $(el).text().split('Via');
-    const linhaSplit = split[0].split(' - ');
-    const linha = linhaSplit.shift().trim();
-    const nome = linhaSplit.join('-').trim();
-    const saidaDestino = nome.split(/ X | x /);
-    const saida = saidaDestino[0];
-    const destino = typeof saidaDestino[1] !== 'undefined' ? saidaDestino[1] : '';
+  return $('.feature').map((i, el) => {
+    const [linha, saida, destino] = $(el).find('h5').text().split(' - ');
 
     return {
       linha,
-      nome,
+      nome: `${saida} x ${destino}`,
       saida,
       destino,
       empresaId

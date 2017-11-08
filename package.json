@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "cheerio": "^0.22.0",
+    "install": "^0.10.1",
     "pdf2json": "^1.1.6",
+    "phantom": "^4.0.5",
     "progress": "^2.0.0",
     "request": "^2.74.0",
     "retry": "^0.10.1",
