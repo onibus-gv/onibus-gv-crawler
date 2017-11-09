@@ -80,7 +80,9 @@ const parseLinhas = (empresaId, body) => {
 
     return {
       linha,
-      nome: `${saida} x ${destino}`,
+      nome: destino
+        ? `${saida} x ${destino}`
+        : saida,
       saida,
       destino,
       empresaId
