@@ -1,13 +1,5 @@
-const retry = require("retry");
-const request = require("request");
-
-const sequentialPromise = (array, fn) => {
-  return array.reduce((sequence, next) => {
-    return sequence.then(() => {
-      return fn(next);
-    });
-  }, Promise.resolve());
-};
+import retry from "retry";
+import request from "request";
 
 // Split it in chunks too many registers to insert at once
 const chunk = (arr, n) => {
@@ -43,8 +35,4 @@ const customRequest = (method, opts) => {
   });
 };
 
-exports = module.exports = {
-  sequentialPromise,
-  chunk,
-  customRequest
-};
+export { chunk, customRequest };

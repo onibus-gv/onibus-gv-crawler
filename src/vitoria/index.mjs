@@ -1,9 +1,9 @@
 "use strict";
 
-const { Linha, Horario, Itinerario } = require("../models");
-const ProgressBar = require("progress");
-const { sequentialPromise, chunk, customRequest } = require("../functions");
-const parser = require("./parser");
+import { Linha, Horario, Itinerario } from "../models/index.mjs";
+import ProgressBar from "progress";
+import { chunk, customRequest } from "../functions.mjs";
+import { parseLinhas, parseHorarios, parseItinerarios } from "./parser.mjs";
 
 const getItinerarios = async empresaId => {
   const linhas = await Linha.findAll({
@@ -15,13 +15,15 @@ const getItinerarios = async empresaId => {
   console.log(
     `Preparando para inserir itinerários de ${linhas.length} linha(s)`
   );
+
   const bar = new ProgressBar("Inserindo :bar :percent", {
     total: linhas.length
   });
 
-  return sequentialPromise(linhas, linha => {
-    return insertItinerarios(linha).then(bar.tick.bind(bar));
-  });
+  for (const linha of linhas) {
+    await insertItinerarios(linha);
+    bar.tick();
+  }
 };
 
 const insertItinerarios = async linha => {
@@ -33,7 +35,7 @@ const insertItinerarios = async linha => {
     }
   });
 
-  const itinerarios = parser.parseItinerarios(linha.id, body);
+  const itinerarios = parseItinerarios(linha.id, body);
   return Itinerario.bulkCreate(itinerarios.ida.concat(itinerarios.volta));
 };
 
@@ -44,7 +46,7 @@ const getLinhas = async empresaId => {
     encoding: "utf-8"
   });
 
-  const linhas = parser.parseLinhas(empresaId, body);
+  const linhas = parseLinhas(empresaId, body);
   await Linha.bulkCreate(linhas);
   console.log(`Inseridas ${linhas.length} linha(s)`);
 };
@@ -58,14 +60,16 @@ const insertHorarios = async linha => {
     }
   });
 
-  const parsed = parser.parseHorarios(linha.id, body);
+  const parsed = parseHorarios(linha.id, body);
   const horarios = parsed.diasUteis
     .concat(parsed.sabado)
     .concat(parsed.domingo);
 
-  return sequentialPromise(chunk(horarios, 100), horariosChunk => {
-    return Horario.bulkCreate(horariosChunk);
-  });
+  const horariosChunk = chunk(horarios, 100);
+
+  for (const horarioChunk of horariosChunk) {
+    await Horario.bulkCreate(horarioChunk);
+  }
 };
 
 const getHorarios = async empresaId => {
@@ -76,17 +80,15 @@ const getHorarios = async empresaId => {
   });
 
   console.log(`Preparando para inserir horários de ${linhas.length} linha(s)`);
+
   const bar = new ProgressBar("Inserindo :bar :percent", {
     total: linhas.length
   });
 
-  return sequentialPromise(linhas, linha => {
-    return insertHorarios(linha).then(bar.tick.bind(bar));
-  });
+  for (const linha of linhas) {
+    await insertHorarios(linha);
+    bar.tick();
+  }
 };
 
-exports = module.exports = {
-  getLinhas: empresaId => getLinhas(empresaId),
-  getHorarios: empresaId => getHorarios(empresaId),
-  getItinerarios: empresaId => getItinerarios(empresaId)
-};
+export { getLinhas, getHorarios, getItinerarios };

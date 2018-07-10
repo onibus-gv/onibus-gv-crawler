@@ -1,4 +1,4 @@
-var cheerio = require("cheerio");
+import cheerio from "cheerio";
 
 const parseItinerarios = (linhaId, body) => {
   const $ = cheerio.load(body);
@@ -165,8 +165,4 @@ const parseHorarios = (linhaId, body) => {
   };
 };
 
-exports = module.exports = {
-  parseItinerarios,
-  parseLinhas,
-  parseHorarios
-};
+export { parseItinerarios, parseLinhas, parseHorarios };

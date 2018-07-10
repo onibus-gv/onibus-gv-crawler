@@ -1,17 +1,12 @@
 "use strict";
 
-const { Linha, Horario, Itinerario } = require("../models");
-
-const ProgressBar = require("progress");
-const http = require("http");
-const fs = require("fs");
-const PDFParser = require("pdf2json/pdfparser");
-
-const { sequentialPromise } = require("../functions");
-
-const parser = require("./parser");
-
-const phantom = require("phantom");
+import { Linha, Horario, Itinerario } from "../models/index.mjs";
+import ProgressBar from "progress";
+import http from "http";
+import fs from "fs";
+import PDFParser from "pdf2json/pdfparser";
+import { parseItinerarios, parseLinhas, parseHorarios } from "./parser.mjs";
+import phantom from "phantom";
 
 const getHorarios = async empresaId => {
   const linhas = await Linha.findAll({
@@ -27,9 +22,10 @@ const getHorarios = async empresaId => {
     width: 40
   });
 
-  return sequentialPromise(linhas, linha => {
-    return insertHorarios(linha).then(bar.tick.bind(bar));
-  });
+  for (const linha of linhas) {
+    await insertHorarios(linha);
+    bar.tick();
+  }
 };
 
 const download = (url, dest, cb) => {
@@ -42,7 +38,7 @@ const download = (url, dest, cb) => {
   });
 };
 
-const insertHorarios = linha => {
+const insertHorarios = async linha => {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
     const url = `http://www.viacaosanremo.com.br/assets/horarios/${
@@ -63,7 +59,7 @@ const insertHorarios = linha => {
           pdfParser.pdfFilePath.replace(".pdf", "").replace("./temppdf/", ""),
           10
         );
-        const horarios = parser.parseHorarios(linhaId, evtData);
+        const horarios = parseHorarios(linhaId, evtData);
 
         Horario.bulkCreate(horarios)
           .then(pdfParser.destroy.bind(pdfParser))
@@ -95,8 +91,8 @@ const getLinhas = async empresaId => {
   await page.open("http://viacaosanremo.com.br/horarios");
   const body = await page.property("content");
 
-  const linhas = parser.parseLinhas(empresaId, body);
-  const itinerarios = parser.parseItinerarios(body);
+  const linhas = parseLinhas(empresaId, body);
+  const itinerarios = parseItinerarios(body);
 
   await Linha.bulkCreate(linhas);
   console.log(`Inseridas ${linhas.length} linha(s)`);
@@ -113,8 +109,4 @@ const getLinhas = async empresaId => {
 
 const getItinerarios = () => {};
 
-exports = module.exports = {
-  getLinhas: empresaId => getLinhas(empresaId),
-  getHorarios: empresaId => getHorarios(empresaId),
-  getItinerarios
-};
+export { getLinhas, getHorarios, getItinerarios };

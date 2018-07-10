@@ -1,8 +1,8 @@
 "use strict";
 
-const { Linha, Horario, Observacao, Itinerario } = require("../models");
-const ProgressBar = require("progress");
-const { sequentialPromise, chunk, customRequest } = require("../functions");
+import { Linha, Horario, Observacao, Itinerario } from "../models/index.mjs";
+import ProgressBar from "progress";
+import { chunk, customRequest } from "../functions.mjs";
 
 const linhasWs =
   "https://sistemas.es.gov.br/webservices/ceturb/onibus/api/ConsultaLinha/";
@@ -44,9 +44,10 @@ const getItinerarios = async empresaId => {
     width: 40
   });
 
-  return sequentialPromise(linhas, linha => {
-    return insertItinerarios(linha).then(bar.tick.bind(bar));
-  });
+  for (const linha of linhas) {
+    await insertItinerarios(linha);
+    bar.tick();
+  }
 };
 
 const insertItinerarios = async linha => {
@@ -121,13 +122,16 @@ const insertHorarios = async linha => {
     };
   });
 
+  // Salva a saida e o destino ao buscar o horário
   linha.saida = saida;
   linha.destino = destino;
   linha.save();
 
-  return sequentialPromise(chunk(horarios, 100), horariosChunk => {
-    return Horario.bulkCreate(horariosChunk);
-  });
+  const horariosChunk = chunk(horarios, 100);
+
+  for (const horarioChunk of horariosChunk) {
+    await Horario.bulkCreate(horarioChunk);
+  }
 };
 
 const getHorarios = async empresaId => {
@@ -144,9 +148,10 @@ const getHorarios = async empresaId => {
     width: 40
   });
 
-  return sequentialPromise(linhas, linha => {
-    return insertHorarios(linha).then(bar.tick.bind(bar));
-  });
+  for (const linha of linhas) {
+    await insertHorarios(linha);
+    bar.tick();
+  }
 };
 
 const insertObservacoes = async linha => {
@@ -183,14 +188,10 @@ const getObservacoes = async empresaId => {
     width: 40
   });
 
-  return sequentialPromise(linhas, linha => {
-    return insertObservacoes(linha).then(bar.tick.bind(bar));
-  });
+  for (const linha of linhas) {
+    await insertObservacoes(linha);
+    bar.tick();
+  }
 };
 
-exports = module.exports = {
-  getLinhas,
-  getHorarios,
-  getItinerarios,
-  getObservacoes
-};
+export { getLinhas, getHorarios, getItinerarios, getObservacoes };

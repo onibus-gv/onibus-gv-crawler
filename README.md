@@ -13,8 +13,8 @@ Empresas funcionando:
 
 ### Pré-Requisitos
 
-* [node.js](https://nodejs.org) >= 7.6
-* [git](https://git-scm.com/)
+- [node.js](https://nodejs.org) >= 10
+- [git](https://git-scm.com/)
 
 ### Instalando
 
@@ -33,6 +33,7 @@ node app.js
 Após o fim da execução será criado um arquivo `onibus.db` na raiz do projeto
 
 ### Linter
+
 ```shell
 npm run eslint
 ```

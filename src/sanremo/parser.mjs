@@ -1,4 +1,4 @@
-const cheerio = require("cheerio");
+import cheerio from "cheerio";
 
 /**
  * Given this layout:
@@ -142,8 +142,4 @@ const parseHorarios = (linhaId, evtData) => {
   return [].concat.apply([], horarios);
 };
 
-exports = module.exports = {
-  parseItinerarios,
-  parseLinhas,
-  parseHorarios
-};
+export { parseItinerarios, parseLinhas, parseHorarios };
