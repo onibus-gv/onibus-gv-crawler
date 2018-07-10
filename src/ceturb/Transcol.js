@@ -1,16 +1,16 @@
-const common = require('./common');
+const common = require("./common");
 
-const tipoLinha = 'T';
+const tipoLinha = "T";
 
 exports = module.exports = {
-  getLinhas: (empresaId) => common.getLinhas(empresaId, tipoLinha),
-  getHorarios: (empresaId) => {
+  getLinhas: empresaId => common.getLinhas(empresaId, tipoLinha),
+  getHorarios: empresaId => {
     return common.getHorarios(empresaId);
   },
-  getItinerarios: (empresaId) => {
+  getItinerarios: empresaId => {
     return common.getItinerarios(empresaId);
   },
-  getObservacoes: (empresaId) => {
+  getObservacoes: empresaId => {
     return common.getObservacoes(empresaId);
   }
 };

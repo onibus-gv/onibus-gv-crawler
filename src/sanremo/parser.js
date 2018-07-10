@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+const cheerio = require("cheerio");
 
 /**
  * Given this layout:
@@ -28,31 +28,41 @@ const cheerio = require('cheerio');
  * }
  *
  */
-const parseItinerarios = (body) => {
+const parseItinerarios = body => {
   const $ = cheerio.load(body);
 
-  return $('.feature').map((i, el) => {
-    const [linha] = $(el).find('h5').text().split(' - ');
-    const itinerarios = $(el).find('p').text().replace('Via ', '').trim().split(/,| e /);
+  return $(".feature")
+    .map((i, el) => {
+      const [linha] = $(el)
+        .find("h5")
+        .text()
+        .split(" - ");
+      const itinerarios = $(el)
+        .find("p")
+        .text()
+        .replace("Via ", "")
+        .trim()
+        .split(/,| e /);
 
-    const ida = itinerarios.map((itinerario) => {
-      return {
-        sentido: 1,
-        linhaId: linha,
-        rua: itinerario.trim()
-      };
-    });
+      const ida = itinerarios.map(itinerario => {
+        return {
+          sentido: 1,
+          linhaId: linha,
+          rua: itinerario.trim()
+        };
+      });
 
-    const volta = itinerarios.reverse().map((itinerario) => {
-      return {
-        sentido: 2,
-        linhaId: linha,
-        rua: itinerario.trim()
-      };
-    });
+      const volta = itinerarios.reverse().map(itinerario => {
+        return {
+          sentido: 2,
+          linhaId: linha,
+          rua: itinerario.trim()
+        };
+      });
 
-    return ida.concat(volta);
-  }).get();
+      return ida.concat(volta);
+    })
+    .get();
 };
 
 /**
@@ -75,19 +85,22 @@ const parseItinerarios = (body) => {
 const parseLinhas = (empresaId, body) => {
   const $ = cheerio.load(body);
 
-  return $('.feature').map((i, el) => {
-    const [linha, saida, destino] = $(el).find('h5').text().split(' - ');
+  return $(".feature")
+    .map((i, el) => {
+      const [linha, saida, destino] = $(el)
+        .find("h5")
+        .text()
+        .split(" - ");
 
-    return {
-      linha,
-      nome: destino
-        ? `${saida} x ${destino}`
-        : saida,
-      saida,
-      destino,
-      empresaId
-    };
-  }).get();
+      return {
+        linha,
+        nome: destino ? `${saida} x ${destino}` : saida,
+        saida,
+        destino,
+        empresaId
+      };
+    })
+    .get();
 };
 
 const parseHorarios = (linhaId, evtData) => {
@@ -96,30 +109,34 @@ const parseHorarios = (linhaId, evtData) => {
   const secondDayHeight = 36;
   const lastDayHeight = 46;
 
-  const horarios = evtData.formImage.Pages.map((pdf) => {
-    return pdf.Texts
-      .filter((obj) => {
-        const txt = decodeURIComponent(obj.R[0].T).trim().split(/:|;/);
-        return txt.length == 2 && !isNaN(parseInt(txt[0], 10)) && obj.y < lastDayHeight;
-      })
-      .map((obj) => {
-        const txt = decodeURIComponent(obj.R[0].T).trim().split(/:|;/);
-        const hora = parseInt(txt[0], 10);
-        const minuto = parseInt(txt[1], 10);
-        const x = obj.x;
-        const y = obj.y;
-        const sentido = x < halfPage ? 1 : 2;
-        const dia = y < firstDayHeight ? 1 : (y < secondDayHeight ? 2 : 3);
+  const horarios = evtData.formImage.Pages.map(pdf => {
+    return pdf.Texts.filter(obj => {
+      const txt = decodeURIComponent(obj.R[0].T)
+        .trim()
+        .split(/:|;/);
+      return (
+        txt.length == 2 && !isNaN(parseInt(txt[0], 10)) && obj.y < lastDayHeight
+      );
+    }).map(obj => {
+      const txt = decodeURIComponent(obj.R[0].T)
+        .trim()
+        .split(/:|;/);
+      const hora = parseInt(txt[0], 10);
+      const minuto = parseInt(txt[1], 10);
+      const x = obj.x;
+      const y = obj.y;
+      const sentido = x < halfPage ? 1 : 2;
+      const dia = y < firstDayHeight ? 1 : y < secondDayHeight ? 2 : 3;
 
-        return {
-          hora,
-          minuto,
-          sentido,
-          dia,
-          siglaObs: null,
-          linhaId,
-        };
-      });
+      return {
+        hora,
+        minuto,
+        sentido,
+        dia,
+        siglaObs: null,
+        linhaId
+      };
+    });
   });
 
   return [].concat.apply([], horarios);
