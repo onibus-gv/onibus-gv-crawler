@@ -49,7 +49,7 @@ const download = (url, dest, cb) => {
 const insertHorarios = (linha) => {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
-    const url = `http:\/\/www.viacaosanremo.com.br/assets/horarios/${linha.linha}.pdf`;
+    const url = `http://www.viacaosanremo.com.br/assets/horarios/${linha.linha}.pdf`;
 
     download(url, './temppdf/' + linha.id + '.pdf', () => {
       pdfParser.loadPDF('./temppdf/' + linha.id + '.pdf');
@@ -111,7 +111,7 @@ const getLinhas = async (empresaId) => {
   console.log(`Inseridos ${rows.length} itinerário(s)`);
 };
 
-const getItinerarios = () => {};
+const getItinerarios = () => { };
 
 exports = module.exports = {
   getLinhas: (empresaId) => getLinhas(empresaId),
