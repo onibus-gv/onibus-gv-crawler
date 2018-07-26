@@ -27,7 +27,7 @@ npm install
 ### Usando
 
 ```shell
-node app.js
+node --experimental-modules app.mjs
 ```
 
 Após o fim da execução será criado um arquivo `onibus.db` na raiz do projeto
