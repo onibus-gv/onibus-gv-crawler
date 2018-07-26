@@ -12,76 +12,63 @@ import * as vitoria from "./src/vitoria/index.mjs";
 
 const opts = { truncate: true };
 
-const log = args => console.log(args);
+(async () => {
+  try {
+    await sequelize.sync();
+    await Empresa.destroy(opts);
+    await Linha.destroy(opts);
+    await Horario.destroy(opts);
+    await Itinerario.destroy(opts);
+    await Observacao.destroy(opts);
 
-sequelize
-  .sync()
-  .then(() => Empresa.destroy(opts))
-  .then(() => Linha.destroy(opts))
-  .then(() => Horario.destroy(opts))
-  .then(() => Itinerario.destroy(opts))
-  .then(() => Observacao.destroy(opts))
+    console.log(`
+      -------------------------
+      -------- Transcol -------
+      -------------------------
+    `);
 
-  .then(() => {
-    log("");
-    log("-------------------------");
-    log("-------- Transcol -------");
-    log("-------------------------");
-    log("");
-  })
-  .then(() => Empresa.build({ nome: "Transcol" }).save())
-  .then(empresa => {
-    return ceturb
-      .getLinhas(empresa.id, "T")
-      .then(() => ceturb.getHorarios(empresa.id))
-      .then(() => ceturb.getItinerarios(empresa.id))
-      .then(() => ceturb.getObservacoes(empresa.id));
-  })
+    const empresaTranscol = await Empresa.build({ nome: "Transcol" }).save();
+    await ceturb.getLinhas(empresaTranscol.id, "T");
+    await ceturb.getHorarios(empresaTranscol.id);
+    await ceturb.getItinerarios(empresaTranscol.id);
+    await ceturb.getObservacoes(empresaTranscol.id);
 
-  .then(() => {
-    log("");
-    log("-------------------------");
-    log("--- Seletivo Transcol ---");
-    log("-------------------------");
-    log("");
-  })
-  .then(() => Empresa.build({ nome: "Seletivo Transcol" }).save())
-  .then(empresa => {
-    return ceturb
-      .getLinhas(empresa.id, "S")
-      .then(() => ceturb.getHorarios(empresa.id))
-      .then(() => ceturb.getItinerarios(empresa.id))
-      .then(() => ceturb.getObservacoes(empresa.id));
-  })
+    console.log(`
+      -------------------------
+      --- Seletivo Transcol ---
+      -------------------------
+    `);
+    const empresaSeletivo = await Empresa.build({
+      nome: "Seletivo Transcol"
+    }).save();
+    await ceturb.getLinhas(empresaSeletivo.id, "S");
+    await ceturb.getHorarios(empresaSeletivo.id);
+    await ceturb.getItinerarios(empresaSeletivo.id);
+    await ceturb.getObservacoes(empresaSeletivo.id);
 
-  .then(() => {
-    log("");
-    log("-------------------------");
-    log("-------- Sanremo --------");
-    log("-------------------------");
-    log("");
-  })
-  .then(() => Empresa.build({ nome: "Sanremo" }).save())
-  .then(empresa => {
-    return sanremo
-      .getLinhas(empresa.id)
-      .then(() => sanremo.getHorarios(empresa.id));
-  })
+    console.log(`
+      -------------------------
+      -------- Sanremo --------
+      -------------------------
+    `);
+    const empresaSanremo = await Empresa.build({ nome: "Sanremo" }).save();
+    await sanremo.getLinhas(empresaSanremo.id);
+    await sanremo.getHorarios(empresaSanremo.id);
 
-  .then(() => {
-    log("");
-    log("-------------------------");
-    log("--- Seletivo Vitória ----");
-    log("-------------------------");
-    log("");
-  })
-  .then(() => Empresa.build({ nome: "Seletivo Vitória" }).save())
-  .then(empresa => {
-    return vitoria
-      .getLinhas(empresa.id)
-      .then(() => vitoria.getHorarios(empresa.id))
-      .then(() => vitoria.getItinerarios(empresa.id));
-  })
+    console.log(`
+      -------------------------
+      --- Seletivo Vitória ----
+      -------------------------
+    `);
+    const empresaVitoria = await Empresa.build({
+      nome: "Seletivo Vitória"
+    }).save();
+    await vitoria.getLinhas(empresaVitoria.id);
+    await vitoria.getHorarios(empresaVitoria.id);
+    await vitoria.getItinerarios(empresaVitoria.id);
 
-  .then(() => log("ok"))
-  .catch(err => log(err));
+    console.log("ok");
+  } catch (e) {
+    console.log(e);
+  }
+})();
